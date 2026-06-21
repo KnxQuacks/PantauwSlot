@@ -1,5 +1,6 @@
-import React from "react";
-import { Camera, Users, Heart } from "lucide-react";
+import React, { useRef, useState } from "react";
+import { Camera, Users, Heart, Copy, Loader2 } from "lucide-react";
+import { toBlob } from "html-to-image";
 import { Member } from "../types";
 
 export function CleanMemberCard({
@@ -17,8 +18,43 @@ export function CleanMemberCard({
   isPinned?: boolean;
   onTogglePin?: (id: string) => void;
 }) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [isCopying, setIsCopying] = useState(false);
+
+  const handleCopyImage = async () => {
+    if (!cardRef.current) return;
+    try {
+      setIsCopying(true);
+
+      const pixelRatio = 3; // Force High-Definition output
+      const blob = await toBlob(cardRef.current, {
+        quality: 1.0,
+        pixelRatio: pixelRatio,
+        backgroundColor: '#ffffff',
+        style: { transform: 'scale(1)', boxShadow: 'none', margin: '0' }
+      });
+
+      if (!blob) throw new Error("Gagal membuat gambar");
+
+      // Salin gambar ke Clipboard
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          [blob.type]: blob
+        })
+      ]);
+
+      window.dispatchEvent(new CustomEvent('show-toast', { detail: 'Gambar disalin ke Clipboard!' }));
+    } catch (err) {
+      console.error("Gagal menyalin gambar:", err);
+      window.dispatchEvent(new CustomEvent('show-toast', { detail: 'Maaf, fitur Copy gagal.' }));
+    } finally {
+      setIsCopying(false);
+    }
+  };
+
   return (
     <div
+      ref={cardRef}
       className="group relative bg-[#ffffff] rounded-2xl p-6 border border-[#e8e8ed] hover:border-[#1d1d1f]/15 shadow-[0_2px_8px_rgba(0,0,0,0.015)] hover:shadow-[0_12px_24px_rgba(0,0,0,0.035)] hover:-translate-y-0.5 transition-all duration-300 ease-out flex flex-col justify-between overflow-hidden"
     >
       <div>
@@ -40,7 +76,21 @@ export function CleanMemberCard({
               <span className={`w-1.5 h-1.5 rounded-full ${status.dotClass}`} />
               {status.label}
             </span>
-            
+
+            {/* Copy Image Button */}
+            <button
+              onClick={handleCopyImage}
+              disabled={isCopying}
+              className="p-1 rounded-full transition-colors hover:bg-[#f5f5f7] active:scale-95 outline-none"
+              title="Copy Gambar;lainny"
+            >
+              {isCopying ? (
+                <Loader2 className="w-4 h-4 text-[#86868b] animate-spin" />
+              ) : (
+                <Copy className="w-4 h-4 text-[#86868b] hover:text-[#007aff] transition-colors" />
+              )}
+            </button>
+
             {/* Pin Oshi Button */}
             {onTogglePin && (
               <button
@@ -48,10 +98,9 @@ export function CleanMemberCard({
                 className="p-1 rounded-full transition-colors hover:bg-[#f5f5f7] active:scale-95 outline-none"
                 title={isPinned ? "Hapus dari Pin" : "Pin Oshi"}
               >
-                <Heart 
-                  className={`w-4 h-4 transition-colors ${
-                    isPinned ? "fill-[#ff2d55] text-[#ff2d55]" : "text-[#d2d2d7] hover:text-[#ff2d55]"
-                  }`} 
+                <Heart
+                  className={`w-4 h-4 transition-colors ${isPinned ? "fill-[#ff2d55] text-[#ff2d55]" : "text-[#d2d2d7] hover:text-[#ff2d55]"
+                    }`}
                 />
               </button>
             )}
