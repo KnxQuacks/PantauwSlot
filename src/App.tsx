@@ -162,6 +162,8 @@ export default function App() {
       if (prev.includes(id)) {
         return prev.filter((pid) => pid !== id);
       } else {
+        // Scroll ke atas secara halus saat melakukan Pin Oshi
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         return [...prev, id];
       }
     });
