@@ -10,15 +10,19 @@ export async function fetchWithCache(url: string, bypassCache = false) {
   }
 
   try {
-    const res = await fetch(url);
+    const res = await fetch(url, {
+      headers: {
+        'x-pantauw-auth': import.meta.env.VITE_PANTAUW_SECRET
+      }
+    });
     const contentType = res.headers.get("content-type");
-    
+
     // Deteksi jika response adalah HTML (Cloudflare Waiting Room)
     if (contentType && contentType.includes("text/html")) {
-      return { 
-        status: false, 
-        error: "WAITING_ROOM", 
-        message: "Server JKT48 sedang dalam antrean (Waiting Room). Data tidak dapat diambil." 
+      return {
+        status: false,
+        error: "WAITING_ROOM",
+        message: "Server JKT48 sedang dalam antrean (Waiting Room). Data tidak dapat diambil."
       };
     }
 
