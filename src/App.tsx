@@ -231,6 +231,15 @@ export default function App() {
 
   const [members, setMembers] = useState<Member[]>([]);
 
+  useEffect(() => {
+    const handleToast = (e: any) => {
+      setToastMessage(e.detail);
+      setTimeout(() => setToastMessage(null), 3000);
+    };
+    window.addEventListener('show-toast', handleToast);
+    return () => window.removeEventListener('show-toast', handleToast);
+  }, []);
+
   const fetchMemberData = useCallback((bypassCache = false) => {
     if (!selectedEventCode) return;
     setIsLoading(true);
