@@ -1,0 +1,6 @@
+{
+  "name": "JKT48 Slot Tracker",
+  "description": "Premium Apple-style dashboard for JKT48 2Shot & Meet Greet slot availability tracking.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
