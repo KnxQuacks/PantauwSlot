@@ -9,7 +9,8 @@ import {
   Info,
   Play,
   X,
-  ChevronDown
+  ChevronDown,
+  MessageCircle
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import jkt48FightVideo from "../assets/video/JKT48-Fight.mp4";
@@ -175,15 +176,15 @@ export default function App() {
         if (data && data.error === "WAITING_ROOM") {
           setSystemStatus("WAITING_ROOM");
           setSystemMessage(data.message);
-          
+
           // FALLBACK: Load known events from Supabase cache
           const { data: sbData } = await supabase.from('jkt48_slots').select('event_code, category');
           if (sbData && sbData.length > 0) {
             const uniqueCodes = Array.from(new Set(sbData.map((d: any) => d.event_code)));
             const fallbackEvents = uniqueCodes.map(code => ({
-                code: code as string,
-                title: `Event ${code} (Data Backup)`,
-                category: sbData.find((d: any) => d.event_code === code)?.category || "2Shot"
+              code: code as string,
+              title: `Event ${code} (Data Backup)`,
+              category: sbData.find((d: any) => d.event_code === code)?.category || "2Shot"
             }));
             setEvents(fallbackEvents);
             if (fallbackEvents.length > 0) {
@@ -230,6 +231,7 @@ export default function App() {
   }, []);
 
   const [members, setMembers] = useState<Member[]>([]);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   useEffect(() => {
     const handleToast = (e: any) => {
@@ -255,22 +257,22 @@ export default function App() {
         if (data && data.error === "WAITING_ROOM") {
           setSystemStatus("WAITING_ROOM");
           setSystemMessage(data.message);
-          
+
           // FALLBACK: Load slot data from Supabase cache
           const { data: sbData } = await supabase.from('jkt48_slots').select('*').eq('event_code', selectedEventCode);
           if (sbData && sbData.length > 0) {
-             const newMembers: Member[] = sbData.map((d: any) => ({
-                id: d.id,
-                name: d.name,
-                category: d.category,
-                total: d.total_quota,
-                filled: d.filled_quota,
-                avatarBg: "bg-gray-50 text-gray-800 border-gray-200",
-                session: d.session_label,
-                jkt48Gen: d.jkt48_gen || "Jalur Khusus",
-                photoUrl: memberPhotos[d.name.toLowerCase()] || undefined
-             }));
-             setMembers(newMembers);
+            const newMembers: Member[] = sbData.map((d: any) => ({
+              id: d.id,
+              name: d.name,
+              category: d.category,
+              total: d.total_quota,
+              filled: d.filled_quota,
+              avatarBg: "bg-gray-50 text-gray-800 border-gray-200",
+              session: d.session_label,
+              jkt48Gen: d.jkt48_gen || "Jalur Khusus",
+              photoUrl: memberPhotos[d.name.toLowerCase()] || undefined
+            }));
+            setMembers(newMembers);
           }
           return;
         }
@@ -475,7 +477,7 @@ export default function App() {
               animate={{ width: `${stats.percentageRemaining}%` }}
               transition={{ duration: 1, ease: "easeOut" }}
               className={`h-full bg-gradient-to-r ${stats.percentageRemaining <= 10 ? "from-[#ff3b30] to-[#ff2d55]" :
-                  stats.percentageRemaining <= 30 ? "from-[#ff9500] to-[#ffcc00]" : "from-[#34c759] to-[#30d158]"
+                stats.percentageRemaining <= 30 ? "from-[#ff9500] to-[#ffcc00]" : "from-[#34c759] to-[#30d158]"
                 }`}
             />
           </div>
@@ -716,6 +718,44 @@ export default function App() {
           </div>
         </div>
       </footer>
+
+      {/* Floating Live Chat WidgetBot Button & Modal */}
+      <div className="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-[60] flex flex-col items-end">
+        <AnimatePresence>
+          {isChatOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: 16, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 16, scale: 0.96 }}
+              transition={{ type: "spring", damping: 28, stiffness: 350 }}
+              className="mb-4 w-[calc(100vw-3rem)] h-[65vh] max-h-[500px] sm:w-[360px] md:w-[400px] md:h-[600px] md:max-h-none bg-transparent rounded-[28px] shadow-[0_24px_48px_rgba(0,0,0,0.12)] border border-[#000000]/[0.04] overflow-hidden flex flex-col origin-bottom-right"
+            >
+              {/* Ultra Minimalist Iframe - Let WidgetBot handle its own UI natively */}
+              <iframe
+                src="https://e.widgetbot.io/channels/1518364650268397688/1518370299177861291"
+                title="Live Chat Discord"
+                width="100%"
+                height="100%"
+                className="border-none w-full h-full bg-[#ffffff]"
+              ></iframe>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <button
+          onClick={() => setIsChatOpen(!isChatOpen)}
+          className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 shadow-[0_8px_24px_rgba(0,0,0,0.08)] border ${isChatOpen
+            ? 'bg-[#1d1d1f] border-transparent text-white'
+            : 'bg-[#ffffff]/90 backdrop-blur-xl border-[#000000]/[0.05] text-[#1d1d1f] hover:bg-white'
+            }`}
+        >
+          {isChatOpen ? (
+            <X className="w-6 h-6" />
+          ) : (
+            <MessageCircle className="w-6 h-6" />
+          )}
+        </button>
+      </div>
 
     </div>
   );
