@@ -51,11 +51,18 @@ export function CleanMemberCard({
       setIsCopying(false);
     }
   };
+  let borderStyle = "border-[#e8e8ed] hover:border-[#1d1d1f]/15 shadow-[0_2px_8px_rgba(0,0,0,0.015)] hover:shadow-[0_12px_24px_rgba(0,0,0,0.035)] hover:-translate-y-0.5";
+  
+  if (progressPercentage >= 90 && progressPercentage < 100) {
+    borderStyle = "border-[#ff9500] ring-1 ring-[#ff9500]/40 shadow-[0_0_20px_rgba(255,149,0,0.5)] hover:shadow-[0_0_30px_rgba(255,149,0,0.7)] hover:-translate-y-0.5";
+  } else if (progressPercentage === 100) {
+    borderStyle = "border-[#ff3b30] ring-1 ring-[#ff3b30]/40 shadow-[0_0_20px_rgba(255,59,48,0.5)] hover:shadow-[0_0_30px_rgba(255,59,48,0.7)] hover:-translate-y-0.5";
+  }
 
   return (
     <div
       ref={cardRef}
-      className="group relative bg-[#ffffff] rounded-2xl p-6 border border-[#e8e8ed] hover:border-[#1d1d1f]/15 shadow-[0_2px_8px_rgba(0,0,0,0.015)] hover:shadow-[0_12px_24px_rgba(0,0,0,0.035)] hover:-translate-y-0.5 transition-all duration-300 ease-out flex flex-col justify-between overflow-hidden"
+      className={`group relative bg-[#ffffff] rounded-2xl p-6 border transition-all duration-300 ease-out flex flex-col justify-between overflow-hidden ${borderStyle}`}
     >
       <div>
         {/* Top Header Row within the Card */}
