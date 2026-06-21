@@ -59,7 +59,7 @@ function ElegantHeader({ stats }: { stats: any }) {
           <h1 className="text-[40px] md:text-[56px] lg:text-[72px] font-bold tracking-tight text-[#1d1d1f] leading-[1.05] antialiased mb-2">
             Pantau Slot JKT48.
             <br />
-            <span className="animate-apple-shimmer">Cepat. Tepat. Real-time.</span>
+            <span className="animate-apple-shimmer">Cepat. Tepat. Praktis.</span>
           </h1>
           <p className="text-[#86868b] text-[19px] md:text-[21px] mt-6 leading-[1.38] font-medium max-w-[600px] tracking-tight">
             Melacak ketersediaan sesi <span className="text-[#1d1d1f] font-semibold">2Shot</span> dan <span className="text-[#1d1d1f] font-semibold">Meet & Greet</span> member JKT48.
